@@ -5,10 +5,15 @@ using System.Linq;
 
 namespace OOP41Itog.Legacy
 {
+    public interface IAirportManager
+    {
+        string ProcessEverything(string operation, string param1, string param2, int param3, double param4);
+    }
+
     // НЕДОСТАТОК 1: God Object (класс который делает всё)
     // НЕДОСТАТОК 2: Нарушение инкапсуляции (public поля)
     // НЕДОСТАТОК 3: Одержимость примитивами
-    public class AirportManager
+    public class AirportManager : IAirportManager
     {
         public List<string> airports;
         public List<string> airlines;
@@ -22,6 +27,7 @@ namespace OOP41Itog.Legacy
         public bool isOperational;
         public string currentStatus;
         public DateTime lastUpdate;
+
         public AirportManager()
         {
             airports = new List<string>();
@@ -38,7 +44,7 @@ namespace OOP41Itog.Legacy
             lastUpdate = DateTime.Now;
         }
 
-        // НЕДОСТАТОК 4: Длинный метод (Long Method) - 150+ строк
+        // НЕДОСТАТОК 4: Длинный метод - 150+ строк
         // НЕДОСТАТОК 5: Условная сложность (вложенные if)
         // НЕДОСТАТОК 6: Магические константы
         // НЕДОСТАТОК 7: Повторяющийся код
@@ -46,6 +52,7 @@ namespace OOP41Itog.Legacy
         public string ProcessEverything(string operation, string param1, string param2, int param3, double param4)
         {
             string result = "";
+
             if (operation == "addAirport")
             {
                 // Дублирование валидации
@@ -105,7 +112,7 @@ namespace OOP41Itog.Legacy
             }
             else if (operation == "createFlight")
             {
-                // НЕДОСТАТОК 9: Цепочки сообщений (Message Chains)
+                // НЕДОСТАТОК 9: Цепочки сообщений
                 if (param1 != null && param2 != null && param3 > 0)
                 {
                     string flightId = param1 + "-" + param2 + "-" + param3.ToString();
@@ -228,7 +235,6 @@ namespace OOP41Itog.Legacy
                 Console.WriteLine("Total Revenue: " + totalRevenue);
                 Console.WriteLine("Last Update: " + lastUpdate);
                 Console.WriteLine("=====================");
-
                 result = "Report generated";
             }
             else
@@ -244,7 +250,6 @@ namespace OOP41Itog.Legacy
         {
             // Копия предыдущего метода с небольшими изменениями
             string result = "";
-
             if (operation == "addAirport")
             {
                 if (param1 != null && param1 != "" && param1.Length > 0)
@@ -272,8 +277,7 @@ namespace OOP41Itog.Legacy
                     result = "Invalid airport name provided";
                 }
             }
-            // ... остальные операции скопированы
-
+            //остальные операции скопированы
             return result;
         }
 
@@ -329,10 +333,69 @@ namespace OOP41Itog.Legacy
             {
                 int result = 0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Пустой catch - проглатываем исключение
             }
+        }
+    }
+
+    public enum LuggageType
+    {
+        HandLuggage,
+        CheckedLuggage,
+        SpecialLuggage
+    }
+
+    public abstract class Luggage
+    {
+        public string OwnerPassport { get; set; }
+        public double Weight { get; set; }
+        public LuggageType Type { get; set; }
+        public string Description { get; set; }
+        public bool IsSecurityRisk { get; set; }
+    }
+
+    public class HandLuggage : Luggage
+    {
+        private const double MAX_WEIGHT = 10.0;
+        private const double MAX_SIZE = 55.0;
+        public double Size { get; set; }
+        public HandLuggage()
+        {
+            Type = LuggageType.HandLuggage;
+        }
+        public bool IsWithinLimits()
+        {
+            return Weight <= MAX_WEIGHT && Size <= MAX_SIZE;
+        }
+        public override string ToString()
+        {
+            return $"Ручная кладь: {Description}, Вес: {Weight}кг, Размер: {Size}см";
+        }
+    }
+
+    public class CheckedLuggage : Luggage
+    {
+        public bool IsFragile { get; set; }
+        public bool NeedsSpecialHandling { get; set; }
+        public double HandlingFee { get; set; }
+        public CheckedLuggage()
+        {
+            Type = LuggageType.CheckedLuggage;
+        }
+        public double CalculateFee()
+        {
+            double fee = HandlingFee;
+            if (IsFragile) fee += 50.0;
+            if (NeedsSpecialHandling) fee += 100.0;
+            if (Weight > 23.0) fee += (Weight - 23.0) * 10.0;
+            return fee;
+        }
+
+        public override string ToString()
+        {
+            return $"Регистрируемый багаж: {Description}, Вес: {Weight}кг, Хрупкий: {IsFragile}, Сбор: {CalculateFee()}руб";
         }
     }
 
@@ -382,24 +445,24 @@ namespace OOP41Itog.Legacy
         }
     }
 
-    // НЕДОСТАТОК 22: Посредник (Middle Man)
+    // НЕДОСТАТОК 22: Посредник
     public class FlightService
     {
-        private AirportManager manager;
+        private readonly IAirportManager _manager;
 
-        public FlightService()
+        public FlightService(IAirportManager manager)
         {
-            manager = new AirportManager();
+            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
         }
 
         public string AddFlight(string flightNumber, string destination, int capacity)
         {
-            return manager.ProcessEverything("createFlight", flightNumber, destination, capacity, 0);
+            return _manager.ProcessEverything("createFlight", flightNumber, destination, capacity, 0);
         }
 
         public string AddPassenger(string name, string passport, int flightId)
         {
-            return manager.ProcessEverything("addPassenger", name, passport, flightId, 0);
+            return _manager.ProcessEverything("addPassenger", name, passport, flightId, 0);
         }
     }
 
@@ -420,33 +483,35 @@ namespace OOP41Itog.Legacy
         public string Terminal;
         public List<string> Crew;
         public List<string> Passengers;
-        // Методы для изменения времени
         public void UpdateDepartureTime(DateTime newTime)
         {
             DepartureTime = newTime;
         }
+
         public void UpdateArrivalTime(DateTime newTime)
         {
             ArrivalTime = newTime;
         }
-        // Методы для изменения статуса
+
         public void SetStatus(string newStatus)
         {
             Status = newStatus;
         }
+
         public void SetDelay(bool isDelayed, string reason, int minutes)
         {
             IsDelayed = isDelayed;
             DelayReason = reason;
             DelayMinutes = minutes;
         }
-        // Методы для управления пассажирами
+
         public void AddPassenger(string passenger)
         {
             if (Passengers == null) Passengers = new List<string>();
             Passengers.Add(passenger);
             PassengerCount++;
         }
+
         public void RemovePassenger(string passenger)
         {
             if (Passengers != null && Passengers.Contains(passenger))
@@ -455,7 +520,7 @@ namespace OOP41Itog.Legacy
                 PassengerCount--;
             }
         }
-        // Методы для управления экипажем
+
         public void AddCrew(string crewMember)
         {
             if (Crew == null) Crew = new List<string>();
@@ -463,7 +528,7 @@ namespace OOP41Itog.Legacy
         }
     }
 
-    // НЕДОСТАТОК 24: Завистливые функции (Envious Feature)
+    // НЕДОСТАТОК 24: Завистливые функции
     public class FlightReporter
     {
         public string GenerateDetailedReport(Flight flight)
@@ -491,12 +556,11 @@ namespace OOP41Itog.Legacy
                     report += "  - " + p + "\n";
                 }
             }
-
             return report;
         }
     }
 
-    // НЕДОСТАТОК 25: Группы данных (Data Clumps)
+    // НЕДОСТАТОК 25: Группы данных
     public class BookingSystem
     {
         // Одна и та же группа параметров передается везде
@@ -508,8 +572,6 @@ namespace OOP41Itog.Legacy
             if (string.IsNullOrEmpty(passengerName)) return false;
             if (string.IsNullOrEmpty(passportNumber)) return false;
             if (string.IsNullOrEmpty(flightNumber)) return false;
-
-            // Логика
             Console.WriteLine("Booking created for: " + passengerName);
             return true;
         }
@@ -522,10 +584,10 @@ namespace OOP41Itog.Legacy
             if (string.IsNullOrEmpty(passengerName)) return false;
             if (string.IsNullOrEmpty(passportNumber)) return false;
             if (string.IsNullOrEmpty(flightNumber)) return false;
-
             Console.WriteLine("Booking updated for: " + passengerName);
             return true;
         }
+
         public bool CancelBooking(string passengerName, string passportNumber, string flightNumber,
                                    string seatClass, int luggageCount, double totalWeight,
                                    bool hasSpecialNeeds, string contactEmail, string contactPhone)
@@ -536,6 +598,19 @@ namespace OOP41Itog.Legacy
             if (string.IsNullOrEmpty(flightNumber)) return false;
             Console.WriteLine("Booking cancelled for: " + passengerName);
             return true;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Система управления аэропортом\n");
+            var manager = new AirportManager();
+            manager.ProcessEverything("addAirport", "SVOO", "Sheremetyevo", 0, 0);
+            manager.ProcessEverything("createFlight", "SU100", "Istanbul", 180, 0);
+            Console.WriteLine("\nНажмите любую клавишу для выхода...");
+            Console.ReadKey();
         }
     }
 }

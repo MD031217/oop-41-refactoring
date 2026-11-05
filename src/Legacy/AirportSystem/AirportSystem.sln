@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirportSystem", "AirportSystem\AirportSystem.csproj", "{7EA60786-7219-4018-9231-9A3B6BF45C0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirportSystem", "AirportSystem\AirportSystem.csproj", "{7EA60786-7219-4018-9231-9A3B6BF45C0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOP41Itog.Tests", "OOP41Itog.Tests\OOP41Itog.Tests.csproj", "{405D7D06-A978-4051-B2E3-95103880D8AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{7EA60786-7219-4018-9231-9A3B6BF45C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EA60786-7219-4018-9231-9A3B6BF45C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EA60786-7219-4018-9231-9A3B6BF45C0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{405D7D06-A978-4051-B2E3-95103880D8AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{405D7D06-A978-4051-B2E3-95103880D8AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{405D7D06-A978-4051-B2E3-95103880D8AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{405D7D06-A978-4051-B2E3-95103880D8AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

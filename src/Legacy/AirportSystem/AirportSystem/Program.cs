@@ -375,6 +375,15 @@ namespace OOP41Itog.Legacy
         }
     }
 
+    // РЕФАКТОРИНГ: Выделение класса для бизнес-правил
+    public static class LuggageFeeRules
+    {
+        public const double StandardWeightLimitKg = 23.0;
+        public const double OverweightRatePerKg = 10.0;
+        public const double FragileFee = 50.0;
+        public const double SpecialHandlingFee = 100.0;
+    }
+
     public class CheckedLuggage : Luggage
     {
         public bool IsFragile { get; set; }
@@ -384,12 +393,16 @@ namespace OOP41Itog.Legacy
         {
             Type = LuggageType.CheckedLuggage;
         }
+
         public double CalculateFee()
         {
             double fee = HandlingFee;
-            if (IsFragile) fee += 50.0;
-            if (NeedsSpecialHandling) fee += 100.0;
-            if (Weight > 23.0) fee += (Weight - 23.0) * 10.0;
+            if (IsFragile)
+                fee += LuggageFeeRules.FragileFee;
+            if (NeedsSpecialHandling)
+                fee += LuggageFeeRules.SpecialHandlingFee;
+            if (Weight > LuggageFeeRules.StandardWeightLimitKg)
+                fee += (Weight - LuggageFeeRules.StandardWeightLimitKg) * LuggageFeeRules.OverweightRatePerKg;
             return fee;
         }
 

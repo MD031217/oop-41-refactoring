@@ -244,40 +244,31 @@ namespace OOP41Itog.Legacy
 
             return result;
         }
-
-        // НЕДОСТАТОК 16: Дублирование метода (почти идентичный)
         public string ProcessEverythingV2(string operation, string param1, string param2, int param3, double param4)
         {
-            // Копия предыдущего метода с небольшими изменениями
             string result = "";
             if (operation == "addAirport")
             {
-                if (param1 != null && param1 != "" && param1.Length > 0)
+                if (!ValidationRules.IsValidName(param1))
                 {
-                    if (param1.Length > 3)
-                    {
-                        if (!airports.Contains(param1))
-                        {
-                            airports.Add(param1);
-                            result = "Airport added successfully: " + param1;
-                            lastUpdate = DateTime.Now;
-                        }
-                        else
-                        {
-                            result = "Airport already exists in system";
-                        }
-                    }
-                    else
-                    {
-                        result = "Airport code is too short";
-                    }
+                    result = "Invalid airport name";
+                }
+                else if (!ValidationRules.IsValidCode(param1, 4))
+                {
+                    result = "Airport code too short";
+                }
+                else if (airports.Contains(param1))
+                {
+                    result = "Airport already exists";
                 }
                 else
                 {
-                    result = "Invalid airport name provided";
+                    airports.Add(param1);
+                    result = "Airport added: " + param1;
+                    totalFlights++;
+                    lastUpdate = DateTime.Now;
                 }
             }
-            //остальные операции скопированы
             return result;
         }
 
@@ -560,42 +551,54 @@ namespace OOP41Itog.Legacy
         }
     }
 
-    // НЕДОСТАТОК 25: Группы данных
+    // РЕФАКТОРИНГ: Выделение класса для устранения повторяющегося кода
+    // Устраняет недостаток: Повторяющийся код в валидации (Issue #4)
+    public static class ValidationRules
+    {
+        public static bool IsValidName(string name)
+        {
+            return !string.IsNullOrEmpty(name) && name.Length > 0;
+        }
+        public static bool IsValidCode(string code, int minLength = 3)
+        {
+            return !string.IsNullOrEmpty(code) && code.Length >= minLength;
+        }
+        public static bool IsValidPassport(string passport)
+        {
+            return !string.IsNullOrEmpty(passport) && passport.Length >= 6;
+        }
+    }
+
+    // РЕФАКТОРИНГ: Использование ValidationRules для устранения дублирования (Issue #4)
     public class BookingSystem
     {
-        // Одна и та же группа параметров передается везде
         public bool CreateBooking(string passengerName, string passportNumber, string flightNumber,
                                    string seatClass, int luggageCount, double totalWeight,
                                    bool hasSpecialNeeds, string contactEmail, string contactPhone)
         {
-            // Валидация
-            if (string.IsNullOrEmpty(passengerName)) return false;
-            if (string.IsNullOrEmpty(passportNumber)) return false;
-            if (string.IsNullOrEmpty(flightNumber)) return false;
+            if (!ValidationRules.IsValidName(passengerName)) return false;
+            if (!ValidationRules.IsValidPassport(passportNumber)) return false;
+            if (!ValidationRules.IsValidCode(flightNumber)) return false;
             Console.WriteLine("Booking created for: " + passengerName);
             return true;
         }
-
         public bool UpdateBooking(string passengerName, string passportNumber, string flightNumber,
                                    string seatClass, int luggageCount, double totalWeight,
                                    bool hasSpecialNeeds, string contactEmail, string contactPhone)
         {
-            // Та же валидация
-            if (string.IsNullOrEmpty(passengerName)) return false;
-            if (string.IsNullOrEmpty(passportNumber)) return false;
-            if (string.IsNullOrEmpty(flightNumber)) return false;
+            if (!ValidationRules.IsValidName(passengerName)) return false;
+            if (!ValidationRules.IsValidPassport(passportNumber)) return false;
+            if (!ValidationRules.IsValidCode(flightNumber)) return false;
             Console.WriteLine("Booking updated for: " + passengerName);
             return true;
         }
-
         public bool CancelBooking(string passengerName, string passportNumber, string flightNumber,
                                    string seatClass, int luggageCount, double totalWeight,
                                    bool hasSpecialNeeds, string contactEmail, string contactPhone)
         {
-            // Та же валидация
-            if (string.IsNullOrEmpty(passengerName)) return false;
-            if (string.IsNullOrEmpty(passportNumber)) return false;
-            if (string.IsNullOrEmpty(flightNumber)) return false;
+            if (!ValidationRules.IsValidName(passengerName)) return false;
+            if (!ValidationRules.IsValidPassport(passportNumber)) return false;
+            if (!ValidationRules.IsValidCode(flightNumber)) return false;
             Console.WriteLine("Booking cancelled for: " + passengerName);
             return true;
         }

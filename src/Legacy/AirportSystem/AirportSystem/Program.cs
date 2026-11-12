@@ -280,64 +280,6 @@ namespace OOP41Itog.Legacy
             //остальные операции скопированы
             return result;
         }
-
-        // НЕДОСТАТОК 17: Некорректные наименования
-        public void DoStuff(int x, string y, double z)
-        {
-            if (x > 0)
-            {
-                if (y != null)
-                {
-                    if (z > 0.0)
-                    {
-                        // Какая-то логика
-                        Console.WriteLine("Processing: " + x + ", " + y + ", " + z);
-                    }
-                }
-            }
-        }
-
-        // НЕДОСТАТОК 18: Мертвый код
-        public void UnusedMethod()
-        {
-            int temp = 0;
-            for (int i = 0; i < 100; i++)
-            {
-                temp += i;
-            }
-        }
-
-        // НЕДОСТАТОК 19: Теоретическая общность (ненужная абстракция)
-        public interface IProcessable
-        {
-            void Process();
-            void Validate();
-            void Execute();
-            void Finalize();
-            void Cleanup();
-        }
-
-        public class DummyProcessor : IProcessable
-        {
-            public void Process() { }
-            public void Validate() { }
-            public void Execute() { }
-            public void Finalize() { }
-            public void Cleanup() { }
-        }
-
-        // НЕДОСТАТОК 20: Неправильная обработка исключений
-        public void RiskyOperation()
-        {
-            try
-            {
-                int result = 0;
-            }
-            catch (Exception)
-            {
-                // Пустой catch - проглатываем исключение
-            }
-        }
     }
 
     public enum LuggageType
